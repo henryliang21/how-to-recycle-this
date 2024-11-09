@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "how-to-recycle-logo.jpg",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -12,6 +13,7 @@
           "value" : "dark"
         }
       ],
+      "filename" : "how-to-recycle-logo 1.jpg",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -23,6 +25,7 @@
           "value" : "tinted"
         }
       ],
+      "filename" : "how-to-recycle-logo 2.jpg",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
