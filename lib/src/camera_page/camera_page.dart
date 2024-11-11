@@ -12,6 +12,7 @@ class CameraPage extends StatefulWidget {
     super.key
   });
   static const routeName = '/CameraPage';
+  static const resultShowingTimeInSecs = 30;
   @override
   CameraPageState createState() => CameraPageState();
 }
@@ -20,6 +21,8 @@ class CameraPageState extends State<CameraPage> {
   CameraController? _controller;
   List<CameraDescription>? _cameras;
   bool _isCameraInitialized = false;
+  bool _isResultLoading = false;
+  bool _visibleResult = false;
   String _result = "";
 
   @override
@@ -47,6 +50,10 @@ class CameraPageState extends State<CameraPage> {
       return;
     }
     try {
+      setState(() { 
+        _isResultLoading = true;
+      });
+
       final xfile = await _controller!.takePicture();
       final file = File(xfile.path);
       final bytes = await file.readAsBytes();
@@ -98,12 +105,23 @@ class CameraPageState extends State<CameraPage> {
       final json = await jsonDecode(r);
       setState(() {
         _result = json["choices"][0]["message"]["content"];
+        _isResultLoading = false;
+        _visibleResult = true;
+        Future.delayed(Duration(seconds: CameraPage.resultShowingTimeInSecs), () {
+          setState(() {
+            _visibleResult = false;
+          });
+        });
         // refresh UI
       });
-      print(_result);
+      // print(_result);
     } else {
-      print(Env.GPT_API_URL);
-      print(response.reasonPhrase);
+      setState(() {
+        _isResultLoading = false;
+        _visibleResult = false;
+      });
+      // print(Env.GPT_API_URL);
+      // print(response.reasonPhrase);
     }
     
     // --- gpt ---
@@ -120,7 +138,7 @@ class CameraPageState extends State<CameraPage> {
     final size = MediaQuery.of(context).size;
     // final operationAreaTopPadding = size.height - 300;
     return Scaffold(
-      body: _isCameraInitialized 
+      body: _isCameraInitialized && !_isResultLoading
           ? Stack(
               children: [
                 SizedBox( // camera container
@@ -151,11 +169,14 @@ class CameraPageState extends State<CameraPage> {
                               flex: 1,
                               child: SingleChildScrollView(
                                 scrollDirection: Axis.vertical,//.horizontal
-                                child: Text(_result,  
-                                  style: const TextStyle(
-                                    fontSize: 16.0, color: Colors.white70,
+                                child: Visibility(
+                                  visible: _visibleResult,
+                                  child:  Text(_result,  
+                                    style: const TextStyle(
+                                      fontSize: 16.0, color: Colors.white70,
+                                    ),
                                   ),
-                                ),
+                                )
                               ),
                             ),
                           ]
